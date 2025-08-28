@@ -27,6 +27,11 @@ func NewUserService(repo repository.UsersRepository) *UserService {
 }
 
 func (s *UserService) Create(ctx context.Context, user domain.User) (int64, *utils.Exception) {
+	u, err := s.repo.FindByEmail(ctx, user.Email)
+	if u != nil {
+		return 0, utils.Confilct(utils.WithMessage("user already exists"))
+	}
+
 	var payload CreateUserPayload
 
 	if err := s.payloadValidation.ValidateStruct(payload); err != nil {
