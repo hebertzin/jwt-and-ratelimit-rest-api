@@ -5,6 +5,7 @@ import (
 
 	"github.com/jwt-and-ratelimit-rest-api/src/domain"
 	"github.com/jwt-and-ratelimit-rest-api/src/infra/repository"
+	"github.com/jwt-and-ratelimit-rest-api/src/infra/security"
 	"github.com/jwt-and-ratelimit-rest-api/src/utils"
 	"github.com/jwt-and-ratelimit-rest-api/src/utils/validation"
 )
@@ -12,6 +13,7 @@ import (
 type UserService struct {
 	repo              repository.UsersRepository
 	payloadValidation validation.PayloadValidation
+	hasher            security.PasswordHasher
 }
 
 type CreateUserPayload struct {
@@ -26,9 +28,17 @@ func NewUserService(repo repository.UsersRepository) *UserService {
 
 func (s *UserService) Create(ctx context.Context, user domain.User) (int64, *utils.Exception) {
 	var payload CreateUserPayload
+
 	if err := s.payloadValidation.ValidateStruct(payload); err != nil {
 		return 0, utils.BadRequest(utils.WithMessage("error validating payload"))
 	}
+
+	hash, err := s.hasher.Hash(user.Password)
+	if err != nil {
+		return 0, utils.BadRequest(utils.WithMessage(err.Error()))
+	}
+
+	user.Password = hash
 
 	id, err := s.repo.Create(ctx, user)
 	if err != nil {
