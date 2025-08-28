@@ -9,7 +9,7 @@ import (
 
 type UsersRepository interface {
 	Create(ctx context.Context, user domain.User) (int64, error)
-	FindByEmail(ctx context.Context, email string) (domain.User, error)
+	FindByEmail(ctx context.Context, email string) (*domain.User, error)
 }
 
 type UserPostgresRepository struct {
@@ -37,10 +37,10 @@ func (ur *UserPostgresRepository) Create(ctx context.Context, user domain.User) 
 	return id, nil
 }
 
-func (ur *UserPostgresRepository) FindByEmail(ctx context.Context, email string) (domain.User, error) {
+func (ur *UserPostgresRepository) FindByEmail(ctx context.Context, email string) (*domain.User, error) {
 	u := domain.User{}
 	q := `SELECT * FROM users WHERE email = ?`
 	tx := ur.DB.QueryRowContext(ctx, q, email)
 	tx.Scan(&u.Name, &u.Email, &u.Password)
-	return domain.User{}, tx.Err()
+	return &domain.User{}, tx.Err()
 }
