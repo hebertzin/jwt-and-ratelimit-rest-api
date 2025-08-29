@@ -4,8 +4,19 @@ import (
 	"github.com/go-playground/validator"
 )
 
-type PayloadValidation struct{}
+type PayloadValidate interface {
+	ValidateStruct(dto any) error
+}
+type PayloadValidation struct {
+	validator *validator.Validate
+}
+
+func NewPayloadValidate() PayloadValidate {
+	return &PayloadValidation{
+		validator: validator.New(),
+	}
+}
 
 func (pv *PayloadValidation) ValidateStruct(dto any) error {
-	return validator.New().Struct(dto)
+	return pv.validator.Struct(dto)
 }
