@@ -12,34 +12,39 @@ import (
 
 type UserService struct {
 	repo              repository.UsersRepository
-	payloadValidation validation.PayloadValidation
+	payloadValidation validation.PayloadValidate
 	hasher            security.PasswordHasher
 }
 
 type CreateUserPayload struct {
-	Name     string `json:"name" validate:"required"`
-	Email    string `json:"email" validate:"required,email"`
-	Password string `json:"password" validate:"required,password"`
+	Name     string `validate:"required"`
+	Email    string `validate:"required"`
+	Password string `validate:"required"`
 }
 
 func NewUserService(
 	repo repository.UsersRepository,
-
 	hash security.PasswordHasher,
+	payloadValidation validation.PayloadValidate,
 ) *UserService {
 	return &UserService{
-		repo:   repo,
-		hasher: hash,
+		repo:              repo,
+		hasher:            hash,
+		payloadValidation: payloadValidation,
 	}
 }
 
 func (s *UserService) Create(ctx context.Context, user domain.User) (int64, *utils.Exception) {
-	u, err := s.repo.FindByEmail(ctx, user.Email)
+	u, _ := s.repo.FindByEmail(ctx, user.Email)
 	if u != nil {
 		return 0, utils.Confilct(utils.WithMessage("user already exists"))
 	}
 
-	var payload CreateUserPayload
+	payload := CreateUserPayload{
+		Email:    user.Email,
+		Name:     user.Name,
+		Password: user.Password,
+	}
 
 	if err := s.payloadValidation.ValidateStruct(payload); err != nil {
 		return 0, utils.BadRequest(utils.WithMessage("error validating payload"))
