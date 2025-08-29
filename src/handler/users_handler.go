@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"encoding/json"
 	"net/http"
 
 	"github.com/jwt-and-ratelimit-rest-api/src/domain"
@@ -13,7 +14,7 @@ type UserHandler struct {
 }
 
 type createUserRequest struct {
-	Name     string
+	Name     string `json:"name"`
 	Email    string `json:"email"`
 	Password string `json:"password"`
 }
@@ -25,9 +26,12 @@ func NewUserHanlder(userService *services.UserService) *UserHandler {
 }
 
 func (handler *UserHandler) Create(w http.ResponseWriter, r *http.Request) {
-	w.Header().Set("Content-Type", "application/json")
-
 	var req createUserRequest
+
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		handler.RespondWithError(w, r, http.StatusBadRequest, "invalid request body", err.Error())
+		return
+	}
 
 	user := domain.User{
 		Name:     req.Name,
@@ -35,11 +39,11 @@ func (handler *UserHandler) Create(w http.ResponseWriter, r *http.Request) {
 		Password: req.Password,
 	}
 
-	result, err := handler.UserService.Create(r.Context(), user)
+	id, err := handler.UserService.Create(r.Context(), user)
 	if err != nil {
 		handler.RespondWithError(w, r, err.Code, err.Error(), err.Message)
 		return
 	}
 
-	handler.RespondWithSuccess(w, http.StatusCreated, "user created successfully", result)
+	handler.RespondWithSuccess(w, http.StatusCreated, "user created successfully", map[string]int64{"user_id": id})
 }
