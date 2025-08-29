@@ -8,14 +8,14 @@ import (
 	"github.com/jwt-and-ratelimit-rest-api/src/infra/repository"
 	"github.com/jwt-and-ratelimit-rest-api/src/infra/security"
 	"github.com/jwt-and-ratelimit-rest-api/src/services"
+	"github.com/jwt-and-ratelimit-rest-api/src/utils/validation"
 )
 
 func UsersGoupRouter(r chi.Router, db *sql.DB) {
 	userRepository := repository.NewUsersRepository(db)
 	hasher := security.NewBcryptHasher(10)
-	userService := services.NewUserService(userRepository, hasher)
+	pv := validation.NewPayloadValidate()
+	userService := services.NewUserService(userRepository, hasher, pv)
 	userHandler := handler.NewUserHanlder(userService)
-
 	r.Post("/api/v1/users", userHandler.Create)
-
 }
