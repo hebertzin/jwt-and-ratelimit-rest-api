@@ -5,12 +5,11 @@ import (
 
 	"github.com/jwt-and-ratelimit-rest-api/src/domain"
 	"github.com/jwt-and-ratelimit-rest-api/src/services"
-	"github.com/jwt-and-ratelimit-rest-api/src/utils"
 )
 
 type UserHandler struct {
-	UserService  services.UserService
-	HttpResponse utils.BaseHandler
+	UserService *services.UserService
+	BaseHandler
 }
 
 type createUserRequest struct {
@@ -19,9 +18,16 @@ type createUserRequest struct {
 	Password string `json:"password"`
 }
 
-func (uh *UserHandler) Create(w http.ResponseWriter, r *http.Request) {
-	var req createUserRequest
+func NewUserHanlder(userService *services.UserService) *UserHandler {
+	return &UserHandler{
+		UserService: userService,
+	}
+}
+
+func (handler *UserHandler) Create(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
+
+	var req createUserRequest
 
 	user := domain.User{
 		Name:     req.Name,
@@ -29,11 +35,11 @@ func (uh *UserHandler) Create(w http.ResponseWriter, r *http.Request) {
 		Password: req.Password,
 	}
 
-	result, err := uh.UserService.Create(r.Context(), user)
+	result, err := handler.UserService.Create(r.Context(), user)
 	if err != nil {
-		uh.HttpResponse.RespondWithError(w, r, err.Code, err.Error(), err.Message)
+		handler.RespondWithError(w, r, err.Code, err.Error(), err.Message)
 		return
 	}
 
-	uh.HttpResponse.RespondWithSuccess(w, http.StatusCreated, "user created successfully", result)
+	handler.RespondWithSuccess(w, http.StatusCreated, "user created successfully", result)
 }
