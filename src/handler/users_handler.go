@@ -8,7 +8,7 @@ import (
 )
 
 type UserHandler struct {
-	UserService services.UserService
+	UserService *services.UserService
 	BaseHandler
 }
 
@@ -18,11 +18,17 @@ type createUserRequest struct {
 	Password string `json:"password"`
 }
 
+func NewUserHanlder(userService *services.UserService) *UserHandler {
+	return &UserHandler{
+		UserService: userService,
+	}
+}
+
 func (handler *UserHandler) Create(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
 	var req createUserRequest
-	
+
 	user := domain.User{
 		Name:     req.Name,
 		Email:    req.Email,

@@ -22,8 +22,15 @@ type CreateUserPayload struct {
 	Password string `json:"password" validate:"required,password"`
 }
 
-func NewUserService(repo repository.UsersRepository) *UserService {
-	return &UserService{repo: repo}
+func NewUserService(
+	repo repository.UsersRepository,
+
+	hash security.PasswordHasher,
+) *UserService {
+	return &UserService{
+		repo:   repo,
+		hasher: hash,
+	}
 }
 
 func (s *UserService) Create(ctx context.Context, user domain.User) (int64, *utils.Exception) {
