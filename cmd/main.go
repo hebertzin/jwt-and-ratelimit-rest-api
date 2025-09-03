@@ -13,13 +13,12 @@ import (
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/jwt-and-ratelimit-rest-api/src/middlewares"
 	routing "github.com/jwt-and-ratelimit-rest-api/src/router"
 )
 
 func main() {
-
-	dsn := os.Getenv("DATABASE_URL'")
-
+	dsn := os.Getenv("DATABASE_URL")
 	db, err := sql.Open("pgx", dsn)
 	if err != nil {
 		log.Fatal("error connecting database", err)
@@ -35,11 +34,17 @@ func main() {
 
 	r := chi.NewRouter()
 
+	r.Use(middlewares.RateLimitMiddleware)
+
 	runMigrations(db)
 
 	routing.UsersGoupRouter(r, db)
 
-	http.ListenAndServe(":8080", r)
+	routing.AuthenticationGroupRouter(r, db)
+
+	if err = http.ListenAndServe(":8080", r); err != nil {
+		log.Fatal("error starting http server", err)
+	}
 }
 
 func runMigrations(db *sql.DB) {
