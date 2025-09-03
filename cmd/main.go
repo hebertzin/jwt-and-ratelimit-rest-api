@@ -91,8 +91,13 @@ func buildRoutes(r chi.Router, db *sql.DB) {
 }
 
 func buildServer(r http.Handler) *http.Server {
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
 	srv := &http.Server{
-		Addr:    ":" + os.Getenv("PORT"),
+		Addr:    ":" + port,
 		Handler: r,
 	}
 
