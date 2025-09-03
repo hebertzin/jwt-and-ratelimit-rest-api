@@ -16,6 +16,7 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	_ "github.com/jwt-and-ratelimit-rest-api/docs"
+	"github.com/jwt-and-ratelimit-rest-api/packages/infra/database"
 	"github.com/jwt-and-ratelimit-rest-api/packages/middlewares"
 	routing "github.com/jwt-and-ratelimit-rest-api/packages/router"
 	httpSwagger "github.com/swaggo/http-swagger"
@@ -37,42 +38,23 @@ import (
 // @in header
 // @name Authorization
 // @description Provide your JWT token in the format: Bearer <token>
+
 func main() {
-	dsn := os.Getenv("DATABASE_URL")
-
-	db, err := sql.Open("pgx", dsn)
-	if err != nil {
-		log.Fatal("error opening database:", err)
-	}
-
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	if err := db.PingContext(ctx); err != nil {
-		log.Fatal("cannot connect to postgres:", err)
-	}
-	cancel()
-
 	r := chi.NewRouter()
 
 	r.Use(middlewares.RateLimitMiddleware)
 
 	r.Get("/swagger/*", httpSwagger.WrapHandler)
 
+	conn := database.Connection{DNS: os.Getenv("DATABASE_URL")}
+
+	db := conn.MustConnect(context.Background())
+
+	buildRoutes(r, db)
+
 	runMigrations(db)
 
-	routing.UsersGroupRouter(r, db)
-
-	routing.AuthenticationGroupRouter(r, db)
-
-	srv := &http.Server{
-		Addr:    ":8080",
-		Handler: r,
-	}
-
-	go func() {
-		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("listen error: %s\n", err)
-		}
-	}()
+	srv := buildServer(r)
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
@@ -91,6 +73,26 @@ func main() {
 	}
 
 	log.Println("server exited")
+}
+
+func buildRoutes(r chi.Router, db *sql.DB) {
+	routing.UsersGroupRouter(r, db)
+	routing.AuthenticationGroupRouter(r, db)
+}
+
+func buildServer(r http.Handler) *http.Server {
+	srv := &http.Server{
+		Addr:    ":8080",
+		Handler: r,
+	}
+
+	go func() {
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("listen error: %s\n", err)
+		}
+	}()
+
+	return srv
 }
 
 func runMigrations(db *sql.DB) {
