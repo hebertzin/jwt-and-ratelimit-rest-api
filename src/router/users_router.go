@@ -11,6 +11,8 @@ import (
 func UsersGoupRouter(r chi.Router, db *sql.DB) {
 	u := factory.UsersFactory(db)
 
+	r.Use(middlewares.RateLimitMiddleware)
+
 	r.Use(middlewares.DoFilter)
 
 	r.Post("/api/v1/accounts", u.Create)
