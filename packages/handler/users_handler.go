@@ -4,8 +4,8 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/jwt-and-ratelimit-rest-api/src/domain"
-	"github.com/jwt-and-ratelimit-rest-api/src/services"
+	"github.com/jwt-and-ratelimit-rest-api/packages/domain"
+	"github.com/jwt-and-ratelimit-rest-api/packages/services"
 )
 
 type (

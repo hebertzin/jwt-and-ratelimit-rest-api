@@ -3,11 +3,11 @@ package services
 import (
 	"context"
 
-	"github.com/jwt-and-ratelimit-rest-api/src/domain"
-	"github.com/jwt-and-ratelimit-rest-api/src/infra/repository"
-	"github.com/jwt-and-ratelimit-rest-api/src/infra/security"
-	"github.com/jwt-and-ratelimit-rest-api/src/utils"
-	"github.com/jwt-and-ratelimit-rest-api/src/utils/validation"
+	"github.com/jwt-and-ratelimit-rest-api/packages/domain"
+	"github.com/jwt-and-ratelimit-rest-api/packages/infra/repository"
+	"github.com/jwt-and-ratelimit-rest-api/packages/infra/security"
+	"github.com/jwt-and-ratelimit-rest-api/packages/utils"
+	"github.com/jwt-and-ratelimit-rest-api/packages/utils/validation"
 )
 
 type UserService struct {
