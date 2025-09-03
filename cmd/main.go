@@ -45,38 +45,51 @@ func main() {
 	buildEnvs()
 
 	r := chi.NewRouter()
-
 	r.Use(middlewares.RateLimitMiddleware)
-
 	r.Get("/swagger/*", httpSwagger.WrapHandler)
 
 	conn := database.Connection{DNS: os.Getenv("DATABASE_URL")}
-
 	db := conn.MustConnect(context.Background())
+	defer db.Close()
 
 	runMigrations(db)
-
 	buildRoutes(r, db)
 
-	srv := buildServer(r)
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+
+	srv := &http.Server{
+		Addr:    ":" + port,
+		Handler: r,
+	}
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
-	<-quit
-	log.Println("shutdown server ...")
+	go func() {
+		<-quit
+		log.Println("shutdown server ...")
 
-	shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 10*time.Second)
-	defer shutdownCancel()
+		shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer shutdownCancel()
 
-	if err := srv.Shutdown(shutdownCtx); err != nil {
-		log.Println("server forced to shutdown:", err)
+		if err := srv.Shutdown(shutdownCtx); err != nil {
+			log.Println("server forced to shutdown:", err)
+		}
+
+		if err := db.Close(); err != nil {
+			log.Println("error closing database:", err)
+		}
+
+		log.Println("server exited")
+	}()
+
+	log.Printf("Starting server on port %s", port)
+
+	if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		log.Fatalf("listen error: %s\n", err)
 	}
-
-	if err := db.Close(); err != nil {
-		log.Println("error closing database:", err)
-	}
-
-	log.Println("server exited")
 }
 
 func buildEnvs() {
