@@ -39,11 +39,6 @@ import (
 // @name Authorization
 // @description Provide your JWT token in the format: Bearer <token>
 
-func buildRoutes(r chi.Router, db *sql.DB) {
-	routing.UsersGroupRouter(r, db)
-	routing.AuthenticationGroupRouter(r, db)
-}
-
 func main() {
 	r := chi.NewRouter()
 
@@ -59,16 +54,7 @@ func main() {
 
 	runMigrations(db)
 
-	srv := &http.Server{
-		Addr:    ":8080",
-		Handler: r,
-	}
-
-	go func() {
-		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("listen error: %s\n", err)
-		}
-	}()
+	srv := buildServer(r)
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
@@ -87,6 +73,26 @@ func main() {
 	}
 
 	log.Println("server exited")
+}
+
+func buildRoutes(r chi.Router, db *sql.DB) {
+	routing.UsersGroupRouter(r, db)
+	routing.AuthenticationGroupRouter(r, db)
+}
+
+func buildServer(r http.Handler) *http.Server {
+	srv := &http.Server{
+		Addr:    ":8080",
+		Handler: r,
+	}
+
+	go func() {
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("listen error: %s\n", err)
+		}
+	}()
+
+	return srv
 }
 
 func runMigrations(db *sql.DB) {
