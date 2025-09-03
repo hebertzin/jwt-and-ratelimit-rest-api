@@ -14,12 +14,13 @@ import (
 	"github.com/golang-migrate/migrate/v4"
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
+	_ "github.com/hebertzin/jwt-and-ratelimit-rest-api/docs"
+	"github.com/hebertzin/jwt-and-ratelimit-rest-api/packages/infra/database"
+	"github.com/hebertzin/jwt-and-ratelimit-rest-api/packages/middlewares"
+	routing "github.com/hebertzin/jwt-and-ratelimit-rest-api/packages/router"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	"github.com/joho/godotenv"
-	_ "github.com/jwt-and-ratelimit-rest-api/docs"
-	"github.com/jwt-and-ratelimit-rest-api/packages/infra/database"
-	"github.com/jwt-and-ratelimit-rest-api/packages/middlewares"
-	routing "github.com/jwt-and-ratelimit-rest-api/packages/router"
+
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 

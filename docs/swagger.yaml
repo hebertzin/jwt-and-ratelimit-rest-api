@@ -1,0 +1,117 @@
+basePath: /api/v1
+definitions:
+  handler.ErrorResponse:
+    properties:
+      detail:
+        type: string
+      instance:
+        type: string
+      status:
+        type: integer
+      title:
+        type: string
+    type: object
+  handler.HttpResponse:
+    properties:
+      code:
+        type: integer
+      data: {}
+      message:
+        type: string
+    type: object
+  handler.authenticateUserRequest:
+    properties:
+      email:
+        type: string
+      password:
+        type: string
+    type: object
+  handler.createUserRequest:
+    properties:
+      email:
+        type: string
+      name:
+        type: string
+      password:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact:
+    email: hebertsantosdeveloper@gmail.com
+    name: API Support
+    url: https://www.hebertzin.com
+  description: A RESTful API built with Go, implementing authentication with JWT and
+    request rate limiting following industry best practices.
+  termsOfService: http://swagger.io/terms/
+  title: JWT and Rate Limit REST API
+  version: "1.0"
+paths:
+  /authentication/login:
+    post:
+      consumes:
+      - application/json
+      description: Authenticates a user with email and password and returns a JWT
+        token
+      parameters:
+      - description: User credentials
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handler.authenticateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: JWT token generated successfully
+          schema:
+            $ref: '#/definitions/handler.HttpResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "401":
+          description: Invalid credentials
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Authenticate user
+      tags:
+      - authentication
+  /users:
+    post:
+      consumes:
+      - application/json
+      description: Creates a new user in the system
+      parameters:
+      - description: User data
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/handler.createUserRequest'
+      produces:
+      - application/json
+      responses:
+        "201":
+          description: User created successfully
+          schema:
+            $ref: '#/definitions/handler.HttpResponse'
+        "400":
+          description: Invalid request body
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+        "409":
+          description: User already exists
+          schema:
+            $ref: '#/definitions/handler.ErrorResponse'
+      summary: Create user
+      tags:
+      - users
+securityDefinitions:
+  BearerAuth:
+    description: 'Provide your JWT token in the format: Bearer <token>'
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"

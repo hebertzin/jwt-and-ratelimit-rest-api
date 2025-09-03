@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/jwt-and-ratelimit-rest-api/packages/domain"
+	"github.com/hebertzin/jwt-and-ratelimit-rest-api/packages/domain"
 )
 
 type UsersRepository interface {
