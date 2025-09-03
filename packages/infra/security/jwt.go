@@ -8,7 +8,7 @@ import (
 	"github.com/golang-jwt/jwt/v5"
 )
 
-var secretKey = []byte(os.Getenv("SECRET_KEY"))
+var secretKey = []byte(os.Getenv("SECRET_JWT"))
 
 func CreateToken(email string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256,
