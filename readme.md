@@ -7,9 +7,9 @@ A RESTful API built with Go, implementing authentication with JWT and request ra
 * [Go](https://golang.org/) 1.22
 * [PostgreSQL](https://www.postgresql.org/)
 * [Docker](https://www.docker.com/)
-* [Gin](https://github.com/gin-gonic/gin)
+* [Chi](https://go-chi.io/#/)
 
-## Estrutura do Projeto
+## Project structure
 
 ```
 .
@@ -36,7 +36,7 @@ A RESTful API built with Go, implementing authentication with JWT and request ra
 *  Docker and Docker Compose
 *  Make (optional, but recommended)
 
-## Instalação & Execução
+## Instalation
 
 Clone repository:
 
@@ -55,11 +55,7 @@ Running on: [http://localhost:8080](http://localhost:8080)
 
 ## API Documentation
 
-After running the project, the Swagger documentation will be available at:
-
-```
-http://localhost:8080/swagger/index.html
-```
+After running the project, the Swagger documentation will be available at:  [http://localhost:8080/swagger/index.html](http://localhost:8080/swagger/index.html)
 
 ## Architecture
 
