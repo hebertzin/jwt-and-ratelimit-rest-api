@@ -23,7 +23,7 @@ func (s *AuthenticationService) AuthenticateUser(ctx context.Context, email, pas
 		return "", utils.BadRequest(utils.WithMessage("user not found"))
 	}
 
-	err := s.hash.Compare(password, u.Password)
+	err := s.hash.Compare(u.Password, password)
 	if err != nil {
 		return "", utils.BadRequest(utils.WithMessage("invalid credentials"))
 	}

@@ -25,6 +25,17 @@ func NewAuthenticatorHandler(userService *services.AuthenticationService) *Authe
 	}
 }
 
+// Authenticate godoc
+// @Summary      Authenticate user
+// @Description  Authenticates a user with email and password and returns a JWT token
+// @Tags         authentication
+// @Accept       json
+// @Produce      json
+// @Param        request body authenticateUserRequest true "User credentials"
+// @Success      200 {object} HttpResponse "JWT token generated successfully"
+// @Failure      400 {object} ErrorResponse "Invalid request body"
+// @Failure      401 {object} ErrorResponse "Invalid credentials"
+// @Router       /authentication/login [post]
 func (handler *AuthenticationHandler) Authenticate(w http.ResponseWriter, r *http.Request) {
 	var req authenticateUserRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
