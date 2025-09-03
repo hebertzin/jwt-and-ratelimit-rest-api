@@ -18,7 +18,8 @@ import (
 
 func main() {
 
-	dsn := os.Getenv("DATABASE_URL")
+	dsn := os.Getenv("DATABASE_URL'")
+
 	db, err := sql.Open("pgx", dsn)
 	if err != nil {
 		log.Fatal("error connecting database", err)
@@ -33,7 +34,9 @@ func main() {
 	}
 
 	r := chi.NewRouter()
+
 	runMigrations(db)
+
 	routing.UsersGoupRouter(r, db)
 
 	http.ListenAndServe(":8080", r)

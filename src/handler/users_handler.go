@@ -8,18 +8,20 @@ import (
 	"github.com/jwt-and-ratelimit-rest-api/src/services"
 )
 
-type UserHandler struct {
-	UserService *services.UserService
-	BaseHandler
-}
+type (
+	UserHandler struct {
+		UserService *services.UserService
+		BaseHandler
+	}
 
-type createUserRequest struct {
-	Name     string `json:"name"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
-}
+	createUserRequest struct {
+		Name     string `json:"name"`
+		Email    string `json:"email"`
+		Password string `json:"password"`
+	}
+)
 
-func NewUserHanlder(userService *services.UserService) *UserHandler {
+func NewUserHandler(userService *services.UserService) *UserHandler {
 	return &UserHandler{
 		UserService: userService,
 	}
@@ -27,19 +29,17 @@ func NewUserHanlder(userService *services.UserService) *UserHandler {
 
 func (handler *UserHandler) Create(w http.ResponseWriter, r *http.Request) {
 	var req createUserRequest
-
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		handler.RespondWithError(w, r, http.StatusBadRequest, "invalid request body", err.Error())
 		return
 	}
-
-	user := domain.User{
+	u := domain.User{
 		Name:     req.Name,
 		Email:    req.Email,
 		Password: req.Password,
 	}
 
-	id, err := handler.UserService.Create(r.Context(), user)
+	id, err := handler.UserService.Create(r.Context(), u)
 	if err != nil {
 		handler.RespondWithError(w, r, err.Code, err.Error(), err.Message)
 		return
