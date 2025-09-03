@@ -10,5 +10,5 @@ import (
 func AuthenticationGroupRouter(r chi.Router, db *sql.DB) {
 	a := factory.AuthenticationFactory(db)
 
-	r.Post("/api/v1/authentication", a.Authenticate)
+	r.Post("/api/v1/authentication/login", a.Authenticate)
 }

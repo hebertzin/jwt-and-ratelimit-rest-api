@@ -13,12 +13,31 @@ import (
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/jackc/pgx/v5/stdlib"
+	_ "github.com/jwt-and-ratelimit-rest-api/docs"
 	"github.com/jwt-and-ratelimit-rest-api/src/middlewares"
 	routing "github.com/jwt-and-ratelimit-rest-api/src/router"
+	httpSwagger "github.com/swaggo/http-swagger"
 )
 
+// @title           JWT and Rate Limit REST API
+// @version         1.0
+// @description     A RESTful API built with Go, implementing authentication with JWT and request rate limiting following industry best practices.
+// @termsOfService  http://swagger.io/terms/
+
+// @contact.name   API Support
+// @contact.url    https://www.hebertzin.com
+// @contact.email  hebertsantosdeveloper@gmail.com
+
+// @host      localhost:8080
+// @BasePath  /api/v1
+
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description Provide your JWT token in the format: Bearer <token>
 func main() {
 	dsn := os.Getenv("DATABASE_URL")
+
 	db, err := sql.Open("pgx", dsn)
 	if err != nil {
 		log.Fatal("error connecting database", err)
@@ -35,6 +54,8 @@ func main() {
 	r := chi.NewRouter()
 
 	r.Use(middlewares.RateLimitMiddleware)
+
+	r.Get("/swagger/*", httpSwagger.WrapHandler)
 
 	runMigrations(db)
 
