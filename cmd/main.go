@@ -6,6 +6,8 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/go-chi/chi/v5"
@@ -40,16 +42,14 @@ func main() {
 
 	db, err := sql.Open("pgx", dsn)
 	if err != nil {
-		log.Fatal("error connecting database", err)
+		log.Fatal("error opening database:", err)
 	}
-	defer db.Close()
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	defer cancel()
-
 	if err := db.PingContext(ctx); err != nil {
-		log.Fatal("cannot connect to postgres", err)
+		log.Fatal("cannot connect to postgres:", err)
 	}
+	cancel()
 
 	r := chi.NewRouter()
 
@@ -59,13 +59,38 @@ func main() {
 
 	runMigrations(db)
 
-	routing.UsersGoupRouter(r, db)
+	routing.UsersGroupRouter(r, db)
 
 	routing.AuthenticationGroupRouter(r, db)
 
-	if err = http.ListenAndServe(":8080", r); err != nil {
-		log.Fatal("error starting http server", err)
+	srv := &http.Server{
+		Addr:    ":8080",
+		Handler: r,
 	}
+
+	go func() {
+		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			log.Fatalf("listen error: %s\n", err)
+		}
+	}()
+
+	quit := make(chan os.Signal, 1)
+	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
+	<-quit
+	log.Println("shutdown server ...")
+
+	shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 10*time.Second)
+	defer shutdownCancel()
+
+	if err := srv.Shutdown(shutdownCtx); err != nil {
+		log.Println("server forced to shutdown:", err)
+	}
+
+	if err := db.Close(); err != nil {
+		log.Println("error closing database:", err)
+	}
+
+	log.Println("server exited")
 }
 
 func runMigrations(db *sql.DB) {
