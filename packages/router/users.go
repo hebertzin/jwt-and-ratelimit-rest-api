@@ -4,7 +4,7 @@ import (
 	"database/sql"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/jwt-and-ratelimit-rest-api/packages/infra/factory"
+	"github.com/hebertzin/jwt-and-ratelimit-rest-api/packages/infra/factory"
 )
 
 func UsersGroupRouter(r chi.Router, db *sql.DB) {

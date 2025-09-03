@@ -3,10 +3,10 @@ package factory
 import (
 	"database/sql"
 
-	"github.com/jwt-and-ratelimit-rest-api/packages/handler"
-	"github.com/jwt-and-ratelimit-rest-api/packages/infra/repository"
-	"github.com/jwt-and-ratelimit-rest-api/packages/infra/security"
-	"github.com/jwt-and-ratelimit-rest-api/packages/services"
+	"github.com/hebertzin/jwt-and-ratelimit-rest-api/packages/handler"
+	"github.com/hebertzin/jwt-and-ratelimit-rest-api/packages/infra/repository"
+	"github.com/hebertzin/jwt-and-ratelimit-rest-api/packages/infra/security"
+	"github.com/hebertzin/jwt-and-ratelimit-rest-api/packages/services"
 )
 
 func AuthenticationFactory(db *sql.DB) *handler.AuthenticationHandler {
