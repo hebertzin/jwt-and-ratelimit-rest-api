@@ -16,8 +16,8 @@ import (
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/jackc/pgx/v5/stdlib"
 	_ "github.com/jwt-and-ratelimit-rest-api/docs"
-	"github.com/jwt-and-ratelimit-rest-api/src/middlewares"
-	routing "github.com/jwt-and-ratelimit-rest-api/src/router"
+	"github.com/jwt-and-ratelimit-rest-api/packages/middlewares"
+	routing "github.com/jwt-and-ratelimit-rest-api/packages/router"
 	httpSwagger "github.com/swaggo/http-swagger"
 )
 
