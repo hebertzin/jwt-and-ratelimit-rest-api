@@ -15,6 +15,7 @@ import (
 	"github.com/golang-migrate/migrate/v4/database/postgres"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 	_ "github.com/jackc/pgx/v5/stdlib"
+	"github.com/joho/godotenv"
 	_ "github.com/jwt-and-ratelimit-rest-api/docs"
 	"github.com/jwt-and-ratelimit-rest-api/packages/infra/database"
 	"github.com/jwt-and-ratelimit-rest-api/packages/middlewares"
@@ -40,6 +41,8 @@ import (
 // @description Provide your JWT token in the format: Bearer <token>
 
 func main() {
+	buildEnvs()
+
 	r := chi.NewRouter()
 
 	r.Use(middlewares.RateLimitMiddleware)
@@ -50,9 +53,9 @@ func main() {
 
 	db := conn.MustConnect(context.Background())
 
-	buildRoutes(r, db)
-
 	runMigrations(db)
+
+	buildRoutes(r, db)
 
 	srv := buildServer(r)
 
@@ -73,6 +76,12 @@ func main() {
 	}
 
 	log.Println("server exited")
+}
+
+func buildEnvs() {
+	if err := godotenv.Load(); err != nil {
+		log.Println(".env file not found, relying on system environment variables")
+	}
 }
 
 func buildRoutes(r chi.Router, db *sql.DB) {
