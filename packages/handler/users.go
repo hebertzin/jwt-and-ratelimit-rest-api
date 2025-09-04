@@ -15,9 +15,10 @@ type (
 	}
 
 	createUserRequest struct {
-		Name     string `json:"name"`
-		Email    string `json:"email"`
-		Password string `json:"password"`
+		Name     string `json:"name" validate:"required"`
+		Email    string `json:"email" validate:"required,email"`
+		Password string `json:"password" validate:"required"`
+		IsActive *bool  `json:"is_active,omitempty"`
 	}
 )
 
@@ -44,10 +45,17 @@ func (handler *UserHandler) Create(w http.ResponseWriter, r *http.Request) {
 		handler.RespondWithError(w, r, http.StatusBadRequest, "invalid request body", err.Error())
 		return
 	}
+
+	isActive := false
+	if req.IsActive != nil {
+		isActive = *req.IsActive
+	}
+
 	u := domain.User{
 		Name:     req.Name,
 		Email:    req.Email,
 		Password: req.Password,
+		IsActive: isActive,
 	}
 
 	id, err := handler.UserService.Create(r.Context(), u)

@@ -1,8 +1,9 @@
 package domain
 
 type User struct {
-	Id       string
+	ID       string
 	Name     string
 	Email    string
 	Password string
+	IsActive bool
 }

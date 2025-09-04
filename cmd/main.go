@@ -50,9 +50,8 @@ func main() {
 
 	conn := database.Connection{DNS: os.Getenv("DATABASE_URL")}
 	db := conn.MustConnect(context.Background())
-	defer db.Close()
-
 	runMigrations(db)
+
 	buildRoutes(r, db)
 
 	port := os.Getenv("PORT")
@@ -101,26 +100,6 @@ func buildEnvs() {
 func buildRoutes(r chi.Router, db *sql.DB) {
 	routing.UsersGroupRouter(r, db)
 	routing.AuthenticationGroupRouter(r, db)
-}
-
-func buildServer(r http.Handler) *http.Server {
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
-	}
-
-	srv := &http.Server{
-		Addr:    ":" + port,
-		Handler: r,
-	}
-
-	go func() {
-		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("listen error: %s\n", err)
-		}
-	}()
-
-	return srv
 }
 
 func runMigrations(db *sql.DB) {
