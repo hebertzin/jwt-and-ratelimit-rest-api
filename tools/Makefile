@@ -13,9 +13,15 @@ clean:
 	@echo "Cleaning up build artifacts..."
 	rm -f $(APP_NAME)
 
+migrate:
+	@echo "Generating Docs..."
+	migrate -path migrations -database "database_url" up
+
+
 documentation:
 	@echo "Generating Docs..."
 	swag init -g cmd/main.go -o docs
+
 
 
 help:
