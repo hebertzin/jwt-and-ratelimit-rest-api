@@ -63,6 +63,12 @@ After running the project, the Swagger documentation will be available at:  [htt
 * Persistence in **PostgreSQL**
 * Authentication via **JWT**
 
+## Deploy
+
+The API has been successfully deployed on Render. You can access it at the following endpoint: https://jwt-and-ratelimit-rest-api.onrender.com
+
+
+
 ## Licence
 
 Distributed under the MIT License. See `LICENSE` for more information.
