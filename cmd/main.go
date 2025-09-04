@@ -50,9 +50,8 @@ func main() {
 
 	conn := database.Connection{DNS: os.Getenv("DATABASE_URL")}
 	db := conn.MustConnect(context.Background())
-	defer db.Close()
-
 	runMigrations(db)
+
 	buildRoutes(r, db)
 
 	port := os.Getenv("PORT")
