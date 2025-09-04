@@ -18,8 +18,9 @@ type UserService struct {
 
 type CreateUserPayload struct {
 	Name     string `validate:"required"`
-	Email    string `validate:"required"`
+	Email    string `validate:"required,email"`
 	Password string `validate:"required"`
+	IsActive bool
 }
 
 func NewUserService(
@@ -35,28 +36,28 @@ func NewUserService(
 }
 
 func (s *UserService) Create(ctx context.Context, user domain.User) (int64, *utils.Exception) {
-	u, _ := s.repo.FindByEmail(ctx, user.Email)
-	if u != nil {
+	existing, _ := s.repo.FindByEmail(ctx, user.Email)
+	if existing != nil {
 		return 0, utils.Confilct(utils.WithMessage("user already exists"))
 	}
 
 	payload := CreateUserPayload{
-		Email:    user.Email,
 		Name:     user.Name,
+		Email:    user.Email,
 		Password: user.Password,
+		IsActive: user.IsActive,
 	}
 
 	if err := s.payloadValidation.ValidateStruct(payload); err != nil {
 		return 0, utils.BadRequest(utils.WithMessage("error validating payload"))
 	}
 
-	hash, err := s.hasher.Hash(user.Password)
+	hashed, err := s.hasher.Hash(user.Password)
 	if err != nil {
 		return 0, utils.BadRequest(utils.WithMessage(err.Error()))
 	}
 
-	user.Password = hash
-
+	user.Password = hashed
 	id, err := s.repo.Create(ctx, user)
 	if err != nil {
 		return id, utils.Unexpected(utils.WithMessage("error creating user"))

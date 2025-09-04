@@ -23,12 +23,12 @@ func NewUsersRepository(db *sql.DB) UsersRepository {
 }
 
 func (ur *UserPostgresRepository) Create(ctx context.Context, user domain.User) (int64, error) {
-	q := `INSERT INTO users (name, email, password) 
-          VALUES ($1, $2, $3) 
+	q := `INSERT INTO users (name, email, password, is_active) 
+          VALUES ($1, $2, $3, $4) 
           RETURNING id`
 
 	var id int64
-	err := ur.DB.QueryRowContext(ctx, q, user.Name, user.Email, user.Password).Scan(&id)
+	err := ur.DB.QueryRowContext(ctx, q, user.Name, user.Email, user.Password, user.IsActive).Scan(&id)
 	if err != nil {
 		return 0, err
 	}
