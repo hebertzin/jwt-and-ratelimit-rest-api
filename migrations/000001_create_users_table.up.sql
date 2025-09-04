@@ -5,3 +5,6 @@ CREATE TABLE IF NOT EXISTS users (
     password TEXT NOT NULL,
     created_at TIMESTAMP DEFAULT NOW()
 );
+
+ALTER TABLE users
+ADD COLUMN is_active BOOLEAN DEFAULT TRUE;
