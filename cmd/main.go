@@ -103,26 +103,6 @@ func buildRoutes(r chi.Router, db *sql.DB) {
 	routing.AuthenticationGroupRouter(r, db)
 }
 
-func buildServer(r http.Handler) *http.Server {
-	port := os.Getenv("PORT")
-	if port == "" {
-		port = "8080"
-	}
-
-	srv := &http.Server{
-		Addr:    ":" + port,
-		Handler: r,
-	}
-
-	go func() {
-		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			log.Fatalf("listen error: %s\n", err)
-		}
-	}()
-
-	return srv
-}
-
 func runMigrations(db *sql.DB) {
 	driver, err := postgres.WithInstance(db, &postgres.Config{})
 	if err != nil {
