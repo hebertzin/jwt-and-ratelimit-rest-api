@@ -3,9 +3,9 @@ package services
 import (
 	"context"
 
-	"github.com/hebertzin/jwt-and-ratelimit-rest-api/packages/infra/repository"
-	"github.com/hebertzin/jwt-and-ratelimit-rest-api/packages/infra/security"
-	"github.com/hebertzin/jwt-and-ratelimit-rest-api/packages/utils"
+	"github.com/hebertzin/jwt-and-ratelimit-rest-api/internal/infra/repository"
+	"github.com/hebertzin/jwt-and-ratelimit-rest-api/internal/infra/security"
+	"github.com/hebertzin/jwt-and-ratelimit-rest-api/internal/utils"
 )
 
 type AuthenticationService struct {

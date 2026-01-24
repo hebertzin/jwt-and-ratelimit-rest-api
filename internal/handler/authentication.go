@@ -4,7 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
-	"github.com/hebertzin/jwt-and-ratelimit-rest-api/packages/services"
+	"github.com/hebertzin/jwt-and-ratelimit-rest-api/internal/services"
 )
 
 type (
