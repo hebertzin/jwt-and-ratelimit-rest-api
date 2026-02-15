@@ -5,7 +5,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/hebertzin/jwt-and-ratelimit-rest-api/packages/infra/security"
+	"github.com/hebertzin/jwt-and-ratelimit-rest-api/internal/infra/security"
 )
 
 func DoFilter(next http.Handler) http.Handler {

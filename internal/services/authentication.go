@@ -3,18 +3,24 @@ package services
 import (
 	"context"
 
-	"github.com/hebertzin/jwt-and-ratelimit-rest-api/packages/infra/repository"
-	"github.com/hebertzin/jwt-and-ratelimit-rest-api/packages/infra/security"
-	"github.com/hebertzin/jwt-and-ratelimit-rest-api/packages/utils"
+	"github.com/hebertzin/jwt-and-ratelimit-rest-api/internal/domain"
+	"github.com/hebertzin/jwt-and-ratelimit-rest-api/internal/infra/repository"
+	"github.com/hebertzin/jwt-and-ratelimit-rest-api/internal/infra/security"
+	"github.com/hebertzin/jwt-and-ratelimit-rest-api/internal/utils"
 )
 
 type AuthenticationService struct {
 	repo repository.UsersRepository
 	hash security.PasswordHasher
+	jwt  domain.JwtService
 }
 
-func NewAuthenticationService(repo repository.UsersRepository, hash security.PasswordHasher) *AuthenticationService {
-	return &AuthenticationService{repo: repo, hash: hash}
+func NewAuthenticationService(repo repository.UsersRepository, hash security.PasswordHasher, jwt domain.JwtService) *AuthenticationService {
+	return &AuthenticationService{
+		repo: repo,
+		hash: hash,
+		jwt:  jwt,
+	}
 }
 
 func (s *AuthenticationService) AuthenticateUser(ctx context.Context, email, password string) (string, *utils.Exception) {
@@ -28,7 +34,7 @@ func (s *AuthenticationService) AuthenticateUser(ctx context.Context, email, pas
 		return "", utils.BadRequest(utils.WithMessage("invalid credentials"))
 	}
 
-	token, err := security.CreateToken(email)
+	token, err := s.jwt.GenerateToken(email, u.ID)
 	if err != nil {
 		return "", utils.BadRequest(utils.WithMessage(err.Error()))
 	}

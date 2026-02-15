@@ -4,7 +4,7 @@ import (
 	"context"
 	"database/sql"
 
-	"github.com/hebertzin/jwt-and-ratelimit-rest-api/packages/domain"
+	"github.com/hebertzin/jwt-and-ratelimit-rest-api/internal/domain"
 )
 
 type UsersRepository interface {
@@ -23,8 +23,8 @@ func NewUsersRepository(db *sql.DB) UsersRepository {
 }
 
 func (ur *UserPostgresRepository) Create(ctx context.Context, user domain.User) (int64, error) {
-	q := `INSERT INTO users (name, email, password, is_active) 
-          VALUES ($1, $2, $3, $4) 
+	q := `INSERT INTO users (name, email, password, is_active)
+          VALUES ($1, $2, $3, $4)
           RETURNING id`
 
 	var id int64

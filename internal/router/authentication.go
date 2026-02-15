@@ -4,11 +4,11 @@ import (
 	"database/sql"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/hebertzin/jwt-and-ratelimit-rest-api/packages/infra/factory"
+	"github.com/hebertzin/jwt-and-ratelimit-rest-api/internal/infra/factory"
 )
 
 func AuthenticationGroupRouter(r chi.Router, db *sql.DB) {
 	a := factory.AuthenticationFactory(db)
 
-	r.Post("/api/v1/authentication/login", a.Authenticate)
+	r.Post("/api/v1/auth/login", a.Authenticate)
 }
