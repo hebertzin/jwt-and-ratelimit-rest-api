@@ -3,18 +3,30 @@ package security
 import (
 	"fmt"
 	"os"
-	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 )
 
 var secretKey = []byte(os.Getenv("SECRET_JWT"))
 
-func CreateToken(email string) (string, error) {
+type Jwt struct {
+	expiration int64
+	service    string
+}
+
+func NewTokenService(exp int64, service string) *Jwt {
+	return &Jwt{
+		expiration: exp,
+		service:    service,
+	}
+}
+
+func (t *Jwt) GenerateToken(email string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256,
 		jwt.MapClaims{
-			"email": email,
-			"exp":   time.Now().Add(time.Hour * 24).Unix(),
+			"email":   email,
+			"exp":     t.expiration,
+			"service": t.service,
 		})
 
 	tokenString, err := token.SignedString(secretKey)
@@ -25,7 +37,7 @@ func CreateToken(email string) (string, error) {
 	return tokenString, nil
 }
 
-func VerifyToken(tokenString string) error {
+func (t *Jwt) VerifyToken(tokenString string) error {
 	token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 		return secretKey, nil
 	})
