@@ -9,12 +9,18 @@ import (
 	"github.com/hebertzin/jwt-and-ratelimit-rest-api/internal/services"
 )
 
+var (
+	ExpirationTimeInMinutes int64 = 15
+)
+
 func AuthenticationFactory(db *sql.DB) *handler.AuthenticationHandler {
 	r := repository.NewUsersRepository(db)
 
 	h := security.NewBcryptHasher(10)
 
-	s := services.NewAuthenticationService(r, h)
+	j := security.NewTokenService(ExpirationTimeInMinutes, "jwt-and-ratelimit-rest-api")
+
+	s := services.NewAuthenticationService(r, h, j)
 
 	return handler.NewAuthenticatorHandler(s)
 }
