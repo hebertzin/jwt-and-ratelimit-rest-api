@@ -3,6 +3,7 @@ package security
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/golang-jwt/jwt/v5"
 )
@@ -21,12 +22,14 @@ func NewTokenService(exp int64, service string) *Jwt {
 	}
 }
 
-func (t *Jwt) GenerateToken(email string) (string, error) {
+func (t *Jwt) GenerateToken(email string, userId string) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256,
 		jwt.MapClaims{
 			"email":   email,
-			"exp":     t.expiration,
+			"sub":     userId,
 			"service": t.service,
+			"iat":     time.Now().Unix(),
+			"exp":     t.expiration,
 		})
 
 	tokenString, err := token.SignedString(secretKey)

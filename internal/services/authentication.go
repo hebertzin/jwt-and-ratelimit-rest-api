@@ -34,7 +34,7 @@ func (s *AuthenticationService) AuthenticateUser(ctx context.Context, email, pas
 		return "", utils.BadRequest(utils.WithMessage("invalid credentials"))
 	}
 
-	token, err := s.jwt.GenerateToken(email)
+	token, err := s.jwt.GenerateToken(email, u.ID)
 	if err != nil {
 		return "", utils.BadRequest(utils.WithMessage(err.Error()))
 	}
